@@ -68,6 +68,8 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  const botPermissions = channel.permissionsFor(client.user);
+  console.log(botPermissions);
   checkLeaderboard(); // Run once when the bot starts
   setInterval(checkLeaderboard, 300000); // Run every 5 minutes (300000 ms)
 });
@@ -109,7 +111,7 @@ async function checkLeaderboard() {
         );
       });
     } else {
-      console.log("no change yet")
+      console.log("no change yet");
     }
 
     previousTopPlayers = topPlayers;
