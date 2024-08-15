@@ -27,38 +27,14 @@ const commands = [
         description: "Shorthand of language (default: en)",
         type: ApplicationCommandOptionType.String,
         choices: [
-          {
-            name: "english",
-            value: "en",
-          },
-          {
-            name: "deutsch",
-            value: "de",
-          },
-          {
-            name: "français",
-            value: "fr",
-          },
-          {
-            name: "brazil (pt)",
-            value: "br",
-          },
-          {
-            name: "espanol",
-            value: "es",
-          },
-          {
-            name: "türkçe",
-            value: "tr",
-          },
-          {
-            name: "italiano",
-            value: "it",
-          },
-          {
-            name: "portuguese",
-            value: "pt",
-          },
+          { name: "english", value: "en" },
+          { name: "deutsch", value: "de" },
+          { name: "français", value: "fr" },
+          { name: "brazil (pt)", value: "br" },
+          { name: "espanol", value: "es" },
+          { name: "türkçe", value: "tr" },
+          { name: "italiano", value: "it" },
+          { name: "portuguese", value: "pt" },
         ],
         required: false,
       },
@@ -92,7 +68,53 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  checkLeaderboard(); // Run once when the bot starts
+  setInterval(checkLeaderboard, 300000); // Run every 5 minutes (300000 ms)
 });
+
+let previousTopPlayers = [];
+
+async function checkLeaderboard() {
+  try {
+    const response = await axios.get(
+      "https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=AUGUST_2024"
+    );
+    const topPlayers = response.data.players.slice(0, 5);
+
+    if (previousTopPlayers.length === 0) {
+      previousTopPlayers = topPlayers;
+      return;
+    }
+
+    let rankChanges = [];
+    topPlayers.forEach((player, index) => {
+      const prevPlayer = previousTopPlayers[index];
+      if (
+        prevPlayer &&
+        player.player.player_id !== prevPlayer.player.player_id
+      ) {
+        rankChanges.push({
+          oldRank: prevPlayer.ranking,
+          newRank: player.ranking,
+          playerName: player.player.player_name,
+        });
+      }
+    });
+
+    if (rankChanges.length > 0) {
+      const channel = await client.channels.fetch(GENERAL_CHANNEL_ID);
+      rankChanges.forEach(async (change) => {
+        await channel.send(
+          `Player ${change.playerName} changed rank from ${change.oldRank} to ${change.newRank}!`
+        );
+      });
+    }
+
+    previousTopPlayers = topPlayers;
+  } catch (error) {
+    console.error("Failed to check leaderboard:", error);
+  }
+}
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
