@@ -105,7 +105,7 @@ async function checkLeaderboard() {
       const channel = await client.channels.fetch(GENERAL_CHANNEL_ID);
       rankChanges.forEach(async (change) => {
         await channel.send(
-          `Player ${change.playerName} changed rank from ${change.oldRank} to ${change.newRank}!`
+          `${change.playerName} is now a top ${change.newRank} in the Blitz Leaderboard! Git gud or get rekt! (Old rank: ${change.oldRank}) `
         );
       });
     } else {
