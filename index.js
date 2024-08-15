@@ -66,8 +66,9 @@ const rest = new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN);
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-client.on("ready", () => {
+client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  const channel = await client.channels.fetch(GENERAL_CHANNEL_ID);
   const botPermissions = channel.permissionsFor(client.user);
   console.log(botPermissions);
   checkLeaderboard(); // Run once when the bot starts
