@@ -108,6 +108,8 @@ async function checkLeaderboard() {
           `Player ${change.playerName} changed rank from ${change.oldRank} to ${change.newRank}!`
         );
       });
+    } else {
+      console.log("no change yet")
     }
 
     previousTopPlayers = topPlayers;
