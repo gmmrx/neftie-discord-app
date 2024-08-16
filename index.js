@@ -70,7 +70,7 @@ const client = new Client({
   shardCount: 1,
 });
 
-client.on("ready", async () => {
+client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
   checkLeaderboard(); // Run once when the bot starts
   setInterval(checkLeaderboard, 300000); // Run every 5 minutes (300000 ms)
