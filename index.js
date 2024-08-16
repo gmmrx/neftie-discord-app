@@ -68,9 +68,6 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  const channel = await client.channels.fetch(GENERAL_CHANNEL_ID);
-  const botPermissions = channel.permissionsFor(client.user);
-  console.log(botPermissions);
   checkLeaderboard(); // Run once when the bot starts
   setInterval(checkLeaderboard, 300000); // Run every 5 minutes (300000 ms)
 });
@@ -79,6 +76,7 @@ let previousTopPlayers = [];
 
 async function checkLeaderboard() {
   try {
+    console.log("checking leaderboard for automated message")
     const response = await axios.get(
       "https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=AUGUST_2024"
     );
