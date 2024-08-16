@@ -64,7 +64,11 @@ const rest = new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN);
   }
 })();
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds],
+  shards: "auto", // This tells Discord.js to automatically determine shard count
+  shardCount: 1,
+});
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -76,7 +80,7 @@ let previousTopPlayers = [];
 
 async function checkLeaderboard() {
   try {
-    console.log("checking leaderboard for automated message")
+    console.log("checking leaderboard for automated message");
     const response = await axios.get(
       "https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=AUGUST_2024"
     );
