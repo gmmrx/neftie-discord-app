@@ -203,4 +203,8 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-client.login(process.env.CLIENT_TOKEN);
+try {
+  client.login(process.env.CLIENT_TOKEN);
+} catch (e) {
+  console.log("client log in issue ---> ", e);
+}
