@@ -10,6 +10,8 @@ import axios from "axios";
 
 // Replace 'YOUR_CHANNEL_ID' with the actual ID of your #general channel
 const GENERAL_CHANNEL_ID = process.env.CHANNEL_ID;
+const TEST_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
+const GUILD_ID = process.env.GUILD_ID; // Your testing guild (server) ID
 
 const commands = [
   {
@@ -40,6 +42,10 @@ const commands = [
       },
     ],
   },
+  {
+    name: "leaderboard",
+    description: "Show the top 10 players on the leaderboard",
+  },
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN);
@@ -49,10 +55,7 @@ const rest = new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN);
     console.log("Started refreshing application (/) commands.");
 
     await rest.put(
-      Routes.applicationGuildCommands(
-        process.env.CLIENT_ID,
-        process.env.GUILD_ID
-      ),
+      Routes.applicationGuildCommands(process.env.CLIENT_ID, GUILD_ID),
       {
         body: commands,
       }
@@ -125,6 +128,44 @@ async function checkLeaderboard() {
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
+
+  // Handle /leaderboard command only from the test channel
+  if (interaction.commandName === "leaderboard") {
+    if (interaction.channelId !== TEST_CHANNEL_ID) {
+      await interaction.reply({
+        content: "This command can only be used in the test channel.",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        "https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=AUGUST_2024"
+      );
+      const topPlayers = response.data.players.slice(0, 10);
+
+      const embed = new EmbedBuilder()
+        .setColor("#c27070")
+        .setTitle("Seekers of Tokane - TOP 10 PLAYERS")
+        .setURL("https://app.aurory.io/leaderboard")
+        .setDescription("Here are the top 10 players currently:")
+        .addFields(
+          topPlayers.map((player, index) => ({
+            name: `#${index + 1} - ${player.player.player_name}`,
+            value: `Score: **${player.score}**`,
+            inline: true,
+          }))
+        );
+      await interaction.reply({ embeds: [embed] });
+    } catch (error) {
+      console.error("Failed to retrieve leaderboard:", error);
+      await interaction.reply(
+        "Failed to retrieve the leaderboard. Please try again later."
+      );
+    }
+    return;
+  }
 
   // Check if the command is issued in the #seekers-of-tokane channel
   if (interaction.channelId !== GENERAL_CHANNEL_ID) {
