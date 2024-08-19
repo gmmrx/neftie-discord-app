@@ -46,6 +46,10 @@ const commands = [
     name: "leaderboard",
     description: "Show the top 10 players on the leaderboard",
   },
+  {
+    name: "tier-list",
+    description: "Show the tier list of current patch. Voted by players.",
+  },
 ];
 
 const rest = new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN);
@@ -129,6 +133,81 @@ async function checkLeaderboard() {
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
+  if (interaction.commandName === "tier-list") {
+    if (interaction.channelId !== TEST_CHANNEL_ID) {
+      await interaction.reply({
+        content: "This command can only be used in the test channel.",
+        ephemeral: true,
+      });
+      return;
+    }
+    try {
+      const response = await axios.get(
+        "https://neftie.app/api/public-tier-list"
+      );
+
+      const tiers = response.data.data; // Assuming the response directly contains the tier data
+
+      // Create the embed for the tier list
+      const embed = new EmbedBuilder()
+        .setColor("#c27070")
+        .setTitle(`Seekers of Tokane - Neftie Tier List (${response.data.patch})`)
+        .setURL("https://neftie.app/tier-list")
+        .setThumbnail('https://neftie.app/images/logo-black.png')
+        .setDescription(`Here is the current tier list for the patch voted by the users.\n[VOTE NOW!](https://neftie.app/tier-list)`)
+        .addFields(
+          {
+            name: "S Tier",
+            value:
+              tiers.sTier.length > 0
+                ? tiers.sTier.join(", ")
+                : "No Nefties in this tier",
+            inline: false,
+          },
+          {
+            name: "A Tier",
+            value:
+              tiers.aTier.length > 0
+                ? tiers.aTier.join(", ")
+                : "No Nefties in this tier",
+            inline: false,
+          },
+          {
+            name: "B Tier",
+            value:
+              tiers.bTier.length > 0
+                ? tiers.bTier.join(", ")
+                : "No Nefties in this tier",
+            inline: false,
+          },
+          {
+            name: "C Tier",
+            value:
+              tiers.cTier.length > 0
+                ? tiers.cTier.join(", ")
+                : "No Nefties in this tier",
+            inline: false,
+          },
+          {
+            name: "D Tier",
+            value:
+              tiers.dTier.length > 0
+                ? tiers.dTier.join(", ")
+                : "No Nefties in this tier",
+            inline: false,
+          }
+        );
+
+      // Reply with the embed in the interaction
+      await interaction.reply({ embeds: [embed] });
+    } catch (error) {
+      console.error("Failed to retrieve leaderboard:", error);
+      await interaction.reply(
+        "Failed to retrieve the leaderboard. Please try again later."
+      );
+    }
+    return;
+  }
   // Handle /leaderboard command only from the test channel
   if (interaction.commandName === "leaderboard") {
     if (interaction.channelId !== TEST_CHANNEL_ID) {
