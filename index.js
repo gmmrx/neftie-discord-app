@@ -73,7 +73,7 @@ const client = new Client({
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
   checkLeaderboard(); // Run once when the bot starts
-  setInterval(checkLeaderboard, 300000); // Run every 5 minutes (300000 ms)
+  setInterval(checkLeaderboard, 600000); // Run every 10 minutes (600000 ms)
 });
 
 let previousTopPlayers = [];
@@ -90,13 +90,13 @@ async function checkLeaderboard() {
       previousTopPlayers = topPlayers;
       return;
     }
-
     let rankChanges = [];
     topPlayers.forEach((player, index) => {
       const prevPlayer = previousTopPlayers[index];
       if (
         prevPlayer &&
-        player.player.player_id !== prevPlayer.player.player_id
+        player.player.player_id === prevPlayer.player.player_id &&
+        parseInt(player.ranking) < parseInt(prevPlayer.ranking) // Only consider upward rank changes
       ) {
         rankChanges.push({
           oldRank: prevPlayer.ranking,
@@ -110,7 +110,7 @@ async function checkLeaderboard() {
       const channel = await client.channels.fetch(GENERAL_CHANNEL_ID);
       rankChanges.forEach(async (change) => {
         await channel.send(
-          `${change.playerName} is now a top ${change.newRank} in the Blitz Leaderboard! Git gud or get rekt! (Old rank: ${change.oldRank}) `
+          `${change.playerName} is now a TOP ${change.newRank} in the Blitz Leaderboard! Git gud or get rekt!`
         );
       });
     } else {
