@@ -9,7 +9,7 @@ import {
 import axios from "axios";
 
 // Replace 'YOUR_CHANNEL_ID' with the actual ID of your #general channel
-const GENERAL_CHANNEL_ID = process.env.CHANNEL_ID;
+const c = process.env.CHANNEL_ID;
 const TEST_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
 const GUILD_ID = process.env.GUILD_ID; // Your testing guild (server) ID
 
@@ -134,7 +134,7 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "tier-list") {
-    if (interaction.channelId !== TEST_CHANNEL_ID) {
+    if (interaction.channelId !== GENERAL_CHANNEL_ID) {
       await interaction.reply({
         content: "This command can only be used in the test channel.",
         ephemeral: true,
@@ -210,7 +210,7 @@ client.on("interactionCreate", async (interaction) => {
   }
   // Handle /leaderboard command only from the test channel
   if (interaction.commandName === "leaderboard") {
-    if (interaction.channelId !== TEST_CHANNEL_ID) {
+    if (interaction.channelId !== GENERAL_CHANNEL_ID) {
       await interaction.reply({
         content: "This command can only be used in the test channel.",
         ephemeral: true,
