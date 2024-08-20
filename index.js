@@ -9,7 +9,7 @@ import {
 import axios from "axios";
 
 // Replace 'YOUR_CHANNEL_ID' with the actual ID of your #general channel
-const c = process.env.CHANNEL_ID;
+const GENERAL_CHANNEL_ID = process.env.CHANNEL_ID;
 const TEST_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
 const GUILD_ID = process.env.GUILD_ID; // Your testing guild (server) ID
 
