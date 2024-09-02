@@ -89,7 +89,7 @@ async function checkLeaderboard() {
   try {
     console.log("checking leaderboard for automated message");
     const response = await axios.get(
-      "https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=AUGUST_2024"
+      "https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=SEPTEMBER_2024"
     );
     const topPlayers = response.data.players.slice(0, 5);
 
