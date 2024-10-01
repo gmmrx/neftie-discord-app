@@ -12,6 +12,7 @@ import axios from "axios";
 const GENERAL_CHANNEL_ID = process.env.CHANNEL_ID;
 const TEST_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
 const GUILD_ID = process.env.GUILD_ID; // Your testing guild (server) ID
+const currentMonth = new Date().toLocaleString('en-US', { month: 'long' }).toUpperCase();
 
 const commands = [
   {
@@ -89,7 +90,7 @@ async function checkLeaderboard() {
   try {
     console.log("checking leaderboard for automated message");
     const response = await axios.get(
-      "https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=SEPTEMBER_2024"
+      `https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event={currentMonth}_2024`
     );
     const topPlayers = response.data.players.slice(0, 5);
 
@@ -220,7 +221,7 @@ client.on("interactionCreate", async (interaction) => {
 
     try {
       const response = await axios.get(
-        "https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=SEPTEMBER_2024"
+        `https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=${currentMonth}_2024`
       );
       const topPlayers = response.data.players.slice(0, 10);
 
