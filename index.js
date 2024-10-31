@@ -144,7 +144,7 @@ client.on("interactionCreate", async (interaction) => {
     }
     try {
       const response = await axios.get(
-        "https://neftie.app/api/public-tier-list"
+        "https://neftie.gg/api/public-tier-list"
       );
 
       const tiers = response.data.data; // Assuming the response directly contains the tier data
@@ -153,9 +153,9 @@ client.on("interactionCreate", async (interaction) => {
       const embed = new EmbedBuilder()
         .setColor("#c27070")
         .setTitle(`Seekers of Tokane - Neftie Tier List (${response.data.patch})`)
-        .setURL("https://neftie.app/tier-list")
-        .setThumbnail('https://neftie.app/images/logo-black.png')
-        .setDescription(`Here is the current tier list for the patch voted by the users.\n[VOTE NOW!](https://neftie.app/tier-list)`)
+        .setURL("https://neftie.gg/tier-list")
+        .setThumbnail('https://neftie.gg/images/logo-black.png')
+        .setDescription(`Here is the current tier list for the patch voted by the users.\n[VOTE NOW!](https://neftie.gg/tier-list)`)
         .addFields(
           {
             name: "S Tier",
@@ -266,7 +266,7 @@ client.on("interactionCreate", async (interaction) => {
 
     try {
       const response = await axios.get(
-        `https://neftie.app/api/public-nefties?name=${neftieName}&lang=${language}`
+        `https://neftie.gg/api/public-nefties?name=${neftieName}&lang=${language}`
       );
 
       const neftieData = response.data.data[0]; // Assuming the API returns an array of Nefties
@@ -281,7 +281,7 @@ client.on("interactionCreate", async (interaction) => {
       const { name, description, skills, good_against, bad_against, image } =
         neftieData;
       // URL for the Neftie
-      const neftieUrl = `https://neftie.app/neftie/${neftieName}`;
+      const neftieUrl = `https://neftie.gg/neftie/${neftieName}`;
       const embed = new EmbedBuilder()
         .setColor(0x0099ff)
         .setTitle(name)
