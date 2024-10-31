@@ -12,7 +12,9 @@ import axios from "axios";
 const GENERAL_CHANNEL_ID = process.env.CHANNEL_ID;
 const TEST_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
 const GUILD_ID = process.env.GUILD_ID; // Your testing guild (server) ID
-const currentMonth = new Date().toLocaleString('en-US', { month: 'long' }).toUpperCase();
+const currentMonth = new Date()
+  .toLocaleString("en-US", { month: "long" })
+  .toUpperCase();
 
 const commands = [
   {
@@ -80,56 +82,9 @@ const client = new Client({
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  checkLeaderboard(); // Run once when the bot starts
-  setInterval(checkLeaderboard, 600000); // Run every 10 minutes (600000 ms)
 });
 
 let previousTopPlayers = [];
-
-async function checkLeaderboard() {
-  try {
-    console.log("checking leaderboard for automated message");
-    const response = await axios.get(
-      `https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event={currentMonth}_2024`
-    );
-    const topPlayers = response.data.players.slice(0, 5);
-
-    if (previousTopPlayers.length === 0) {
-      previousTopPlayers = topPlayers;
-      return;
-    }
-    let rankChanges = [];
-    topPlayers.forEach((player, index) => {
-      const prevPlayer = previousTopPlayers[index];
-      if (
-        prevPlayer &&
-        player.player.player_id === prevPlayer.player.player_id &&
-        parseInt(player.ranking) < parseInt(prevPlayer.ranking) // Only consider upward rank changes
-      ) {
-        rankChanges.push({
-          oldRank: prevPlayer.ranking,
-          newRank: player.ranking,
-          playerName: player.player.player_name,
-        });
-      }
-    });
-
-    if (rankChanges.length > 0) {
-      const channel = await client.channels.fetch(GENERAL_CHANNEL_ID);
-      rankChanges.forEach(async (change) => {
-        await channel.send(
-          `${change.playerName} is now a TOP ${change.newRank} in the Blitz Leaderboard! Git gud or get rekt!`
-        );
-      });
-    } else {
-      console.log("no change yet");
-    }
-
-    previousTopPlayers = topPlayers;
-  } catch (error) {
-    console.error("Failed to check leaderboard:", error);
-  }
-}
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
@@ -152,10 +107,14 @@ client.on("interactionCreate", async (interaction) => {
       // Create the embed for the tier list
       const embed = new EmbedBuilder()
         .setColor("#c27070")
-        .setTitle(`Seekers of Tokane - Neftie Tier List (${response.data.patch})`)
+        .setTitle(
+          `Seekers of Tokane - Neftie Tier List (${response.data.patch})`
+        )
         .setURL("https://neftie.gg/tier-list")
-        .setThumbnail('https://neftie.gg/images/logo-black.png')
-        .setDescription(`Here is the current tier list for the patch voted by the users.\n[VOTE NOW!](https://neftie.gg/tier-list)`)
+        .setThumbnail("https://neftie.gg/images/logo-black.png")
+        .setDescription(
+          `Here is the current tier list for the patch voted by the users.\n[VOTE NOW!](https://neftie.gg/tier-list)`
+        )
         .addFields(
           {
             name: "S Tier",
