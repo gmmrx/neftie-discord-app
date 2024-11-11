@@ -188,7 +188,7 @@ client.on("interactionCreate", async (interaction) => {
         .setColor("#c27070")
         .setTitle("Seekers of Tokane - TOP 10 PLAYERS")
         .setURL("https://app.aurory.io/leaderboard")
-        .setDescription("Here are the top 10 players currently:")
+        .setDescription(`Here are the top 10 players of ${currentMonth}:`)
         .addFields(
           topPlayers.map((player, index) => ({
             name: `#${index + 1} - ${player.player.player_name}`,
