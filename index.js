@@ -7,15 +7,17 @@ import {
   EmbedBuilder,
 } from "discord.js";
 import axios from "axios";
+import dotenv from "dotenv";
+import FactPoster from "./fact-poster.js";
+
+dotenv.config();
 
 // Replace 'YOUR_CHANNEL_ID' with the actual ID of your #general channel
-const GENERAL_CHANNEL_ID = process.env.CHANNEL_ID;
+const GENERAL_CHANNEL_ID = process.env.GENERAL_CHANNEL_ID;
 const TEST_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
+const TEST_GUILD_ID = process.env.TEST_GUILD_ID;
 const GUILD_ID = process.env.GUILD_ID; // Your testing guild (server) ID
-const currentMonth = new Date()
-  .toLocaleString("en-US", { month: "long" })
-  .toUpperCase();
-
+const factPoster = new FactPoster();
 const commands = [
   {
     name: "neftie",
@@ -75,13 +77,35 @@ const rest = new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN);
 })();
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
   shards: "auto", // This tells Discord.js to automatically determine shard count
   shardCount: 1,
 });
 
-client.on("ready", () => {
+client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  try {
+    // Initialize the fact poster
+    await factPoster.initialize();
+
+    // Get the channel
+    const channel = client.channels.cache.get(GENERAL_CHANNEL_ID);
+
+    if (!channel) {
+      console.error("Could not find the general channel!");
+      return;
+    }
+
+    // Optional: Post initial fact
+    await factPoster.postRandomFact(channel);
+
+    // Set up the interval for posting facts (10 hours = 36000000 milliseconds)
+    setInterval(() => {
+      factPoster.postRandomFact(channel);
+    }, 3_600_000);
+  } catch (error) {
+    console.error("Error setting up fact poster:", error);
+  }
 });
 
 let previousTopPlayers = [];
@@ -179,8 +203,12 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     try {
+      const currentMonth = new Date()
+        .toLocaleString("en-US", { month: "long" })
+        .toUpperCase();
+
       const response = await axios.get(
-        `https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=${currentMonth}_2024`
+        `https://aggregator-api.live.aurory.io/v1/leaderboards?mode=pvp&event=${currentMonth}_2025`
       );
       const topPlayers = response.data.players.slice(0, 10);
 
