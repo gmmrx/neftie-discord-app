@@ -1,4 +1,3 @@
-// factPoster.js
 import { EmbedBuilder } from "discord.js";
 import fs from "fs/promises";
 
@@ -9,6 +8,7 @@ class FactPoster {
     this.postedMessages = new Set();
     this.postedImageMessages = new Set();
     this.lastPostTime = null;
+    this.shouldPostImage = true; // New flag to track what type should be posted next
   }
 
   async initialize() {
@@ -36,10 +36,18 @@ class FactPoster {
     const messages = isImage ? this.imageMessages : this.textMessages;
     const postedSet = isImage ? this.postedImageMessages : this.postedMessages;
 
-    // If all messages have been posted, reset the tracking
+    // If all messages of current type have been posted
     if (postedSet.size >= messages.length) {
-      console.log("Resetting message tracker");
+      console.log(`Resetting ${isImage ? "image" : "text"} message tracker`);
       postedSet.clear();
+
+      // If both sets are empty, we've completed a full cycle
+      if (
+        this.postedMessages.size === 0 &&
+        this.postedImageMessages.size === 0
+      ) {
+        console.log("Completed full cycle of all messages");
+      }
     }
 
     // Get unposted messages
@@ -66,6 +74,36 @@ class FactPoster {
     return true;
   }
 
+  determineMessageType() {
+    // If we should post an image but all images are posted and there are unposted texts
+    if (
+      this.shouldPostImage &&
+      this.postedImageMessages.size >= this.imageMessages.length &&
+      this.postedMessages.size < this.textMessages.length
+    ) {
+      this.shouldPostImage = false;
+    }
+    // If we should post a text but all texts are posted and there are unposted images
+    else if (
+      !this.shouldPostImage &&
+      this.postedMessages.size >= this.textMessages.length &&
+      this.postedImageMessages.size < this.imageMessages.length
+    ) {
+      this.shouldPostImage = true;
+    }
+    // If both sets are complete, reset everything and start with an image
+    else if (
+      this.postedMessages.size >= this.textMessages.length &&
+      this.postedImageMessages.size >= this.imageMessages.length
+    ) {
+      this.postedMessages.clear();
+      this.postedImageMessages.clear();
+      this.shouldPostImage = true;
+    }
+
+    return this.shouldPostImage;
+  }
+
   async postRandomFact(channel) {
     try {
       // Check if we should post based on time
@@ -73,8 +111,8 @@ class FactPoster {
         return;
       }
 
-      // Randomly choose between text and image message
-      const isImage = Math.random() < 0.5 && this.imageMessages.length > 0;
+      // Determine if we should post an image or text message
+      const isImage = this.determineMessageType();
       const message = this.getRandomMessage(isImage);
 
       if (!message) {
@@ -94,9 +132,10 @@ class FactPoster {
         await channel.send(message);
       }
 
-      // Update last post time
+      // Update last post time and toggle message type for next post
       this.lastPostTime = Date.now();
-      console.log("Posted new fact");
+      this.shouldPostImage = !this.shouldPostImage;
+      console.log(`Posted new ${isImage ? "image" : "text"} fact`);
     } catch (error) {
       console.error("Error posting fact:", error);
     }

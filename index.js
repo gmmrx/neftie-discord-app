@@ -13,10 +13,10 @@ import FactPoster from "./fact-poster.js";
 dotenv.config();
 
 // Replace 'YOUR_CHANNEL_ID' with the actual ID of your #general channel
-const GENERAL_CHANNEL_ID = process.env.CHANNEL_ID;
+const GENERAL_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
 const TEST_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
 const TEST_GUILD_ID = process.env.TEST_GUILD_ID;
-const GUILD_ID = process.env.GUILD_ID; // Your testing guild (server) ID
+const GUILD_ID = process.env.TEST_GUILD_ID; // Your testing guild (server) ID
 const factPoster = new FactPoster();
 const commands = [
   {
@@ -54,6 +54,10 @@ const commands = [
   {
     name: "tier-list",
     description: "Show the tier list of current patch. Voted by players.",
+  },
+  {
+    name: "elements",
+    description: "Shows how different elements interact with each other",
   },
 ];
 
@@ -112,6 +116,27 @@ let previousTopPlayers = [];
 
 client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
+
+  if (interaction.commandName === "elements") {
+    // First check channel
+    if (interaction.channelId !== GENERAL_CHANNEL_ID) {
+      await interaction.reply({
+        content:
+          "This command can only be used in the #seekers-of-tokane channel.",
+        ephemeral: true,
+      });
+      return; // Important: return here to prevent further execution
+    }
+
+    const embed = new EmbedBuilder()
+      .setColor("#0099ff")
+      .setTitle("Neftie Element Interaction")
+      .setDescription("This is how elements/nefties interact with each other")
+      .setImage("https://neftie.gg/images/elements-with-nefties.png");
+
+    await interaction.reply({ embeds: [embed] });
+    return; // Add return here too
+  }
 
   if (interaction.commandName === "tier-list") {
     if (interaction.channelId !== GENERAL_CHANNEL_ID) {
