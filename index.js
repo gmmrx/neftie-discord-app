@@ -13,10 +13,10 @@ import FactPoster from "./fact-poster.js";
 dotenv.config();
 
 // Replace 'YOUR_CHANNEL_ID' with the actual ID of your #general channel
-const GENERAL_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
+const GENERAL_CHANNEL_ID = process.env.CHANNEL_ID;
 const TEST_CHANNEL_ID = process.env.TEST_CHANNEL_ID;
 const TEST_GUILD_ID = process.env.TEST_GUILD_ID;
-const GUILD_ID = process.env.TEST_GUILD_ID; // Your testing guild (server) ID
+const GUILD_ID = process.env.GUILD_ID; // Your testing guild (server) ID
 const factPoster = new FactPoster();
 const commands = [
   {
